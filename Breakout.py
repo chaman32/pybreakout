@@ -99,20 +99,55 @@ class Breakout:
         elif is_key_pressed[pygame.K_RIGHT]:
             callback(1)
 
+       # def check_collision(self) -> None:
+       #
+       #  if self.ball.position.y >= 565:
+       #
+       #      ball_x, ball_y = self.ball.get_position()
+       #      bat_x, bat_y = self.bat.get_position()
+       #
+       #      difference_x = ball_x + self.ball.get_radius() - bat_x
+       #
+       #      if not self.ball_is_play:
+       #          if -5 < difference_x < 120:
+       #              dx, dy = self.ball.get_direction()
+       #              # check this logic
+       #              # self.ball.direction.x = -dx
+       #              self.ball.direction.y = -dy
+       #              self.ball.sound.play()
+       #
+       #              self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
+       #
+       #              # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
+       #              print("Impact! difference {}, ball X:{} and bat X:{} "
+       #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
+       #          else:
+       #              self.ball_is_play = True
+       #              print("Finish difference {}, ball X:{} and bat X:{} "
+       #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
+       #      else:
+       #          # Temporary until I do something with the lost match
+       #          self.ball_is_play = False
+
     def check_collision(self) -> None:
 
         if self.ball.position.y >= 565:
 
             ball_x, ball_y = self.ball.get_position()
             bat_x, bat_y = self.bat.get_position()
+            ball_width, ball_height = self.ball.get_width_height()
+            bat_width, bat_height = self.bat.get_width_height()
+
+            ball_rect = pygame.Rect(ball_x, ball_y, ball_width, ball_height)
+            paddle_rect = pygame.Rect(bat_x, bat_y, bat_width, bat_height)
 
             difference_x = ball_x + self.ball.get_radius() - bat_x
 
             if not self.ball_is_play:
-                if -5 < difference_x < 120:
+                if ball_rect.colliderect(paddle_rect):
                     dx, dy = self.ball.get_direction()
-                    #check this logic
-                    #self.ball.direction.x = -dx
+                    # check this logic
+                    # self.ball.direction.x = -dx
                     self.ball.direction.y = -dy
                     self.ball.sound.play()
 
@@ -128,6 +163,7 @@ class Breakout:
             else:
                 # Temporary until I do something with the lost match
                 self.ball_is_play = False
+
 
     def update(self):
         for entity in [self.ball] + [self.bat] + self.impacts:

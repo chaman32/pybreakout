@@ -38,6 +38,10 @@ class Entity(ABC):
     def get_direction(self) -> tuple:
         pass
 
+    def get_width_height(self) -> int:
+        return self.sprite.get_width(), self.sprite.get_height()
+
+
 
 
 class GameStage:
