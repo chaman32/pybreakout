@@ -37,15 +37,7 @@ class Breakout:
 
         self.surface = init_pygame(WIDTH, HEIGHT)
         self.frame_advance = None
-        # self.game_stage = GameStage(WIDTH, HEIGHT)
         self.seconds_count = 1
-        # self.bat = None
-        # self.bat = Bat((WIDTH / 2 - 60, HEIGHT - 20), self.game_stage)
-        # self.ball = Ball((345 + self.bat.width/2, 565), self.game_stage)
-        # self.ball = Ball((345 + self.bat.width / 2, 565), self.game_stage)
-        # self.ball = Ball((345 + self.bat.width / 2, HEIGHT - self.bat.height), self.game_stage)
-        # self.game_stage.add_sprite(self.bat)
-        # self.game_stage.add_sprite(self.ball)
         self.ball_is_play = False
         self.impacts = []
         self.bat = None
@@ -78,38 +70,17 @@ class Breakout:
             self.seconds_count += 1
 
             self.surface.fill((10, 10, 10))
-
-            # self.game_stage.screen.fill((10, 10, 10))
-            # self.game_stage.update_impacts()
-            # self.ball.move()
             self.update()
             self.render()
             self.handle_input(events=pygame.event.get(), callback=move_object)
             self.check_collision()
-            # self.game_stage.draw_sprites()
-            # self.input(pygame.event.get())
             self.remove_animations()
 
             # Double buffer draw
             pygame.display.flip()
             clock.tick(60)
 
-    # def input(self, events) -> None:
-    #
-    #     self.frame_advance = False
-    #     for event in events:
-    #         if event.type == QUIT:
-    #             sys.exit(0)
-    #         elif event.type == KEYDOWN:
-    #             if event.key == K_ESCAPE:
-    #                 sys.exit(0)
-    #
-    #     is_key_pressed = pygame.key.get_pressed()
-    #
-    #     if is_key_pressed[pygame.K_LEFT]:
-    #         self.bat.move_left()
-    #     elif is_key_pressed[pygame.K_RIGHT]:
-    #         self.bat.move_right()
+
 
     def handle_input(self, events, callback) -> None:
 
@@ -141,8 +112,8 @@ class Breakout:
                 if -5 < difference_x < 120:
                     dx, dy = self.ball.get_direction()
                     #check this logic
-                    self.ball.direction.x = -dx
-                    #self.ball.direction.y = -dy
+                    #self.ball.direction.x = -dx
+                    self.ball.direction.y = -dy
                     self.ball.sound.play()
 
                     self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
@@ -170,6 +141,19 @@ class Breakout:
         for i in range(len(self.impacts) - 1, -1, -1):
             if self.impacts[i].time >= 10:
                 del self.impacts[i]
+
+
+class Brick(Entity):
+
+    # Define the brick's position and size
+    brick_x = 100
+    brick_y = 200
+    brick_width = 50
+    brick_height = 20
+    def __init__(self, position, surface):
+        super().__init__(position, None, None, surface)
+
+
 
 
 class Bat(Entity):
@@ -201,57 +185,8 @@ class Bat(Entity):
         return self.direction.x, self.direction.y
 
 
-# class Bat_old:
-#     velocity = Vector2(15, 0)
-#
-#     def __init__(self, position, game_stage):
-#         self.game_stage = game_stage
-#         self.sprite_surface = load_sprite("bat0")
-#         self.position = Vector2(position)
-#         self.width = self.sprite_surface.get_width()
-#         self.height = self.sprite_surface.get_height()
-#
-#     def move_left(self) -> None:
-#         old_x = self.position.x
-#         self.position.x = self.position.x - self.velocity.x
-#         if self.position.x <= -6:
-#             self.position.x = old_x
-#
-#     def move_right(self) -> None:
-#         old_x = self.position.x
-#         self.position.x = self.position.x + self.velocity.x
-#         if self.position.x + self.width - 6 >= self.game_stage.screen_width:
-#             self.position.x = old_x
 
 
-import math
-
-
-# class BreakoutBall:
-#     def __init__(self, x, y, radius, speed, angle):
-#         self.x = x
-#         self.y = y
-#         self.radius = radius
-#         self.speed = speed
-#         self.angle = angle
-#         self.dx = math.cos(angle) * speed
-#         self.dy = math.sin(angle) * speed
-#
-#     def move(self):
-#         self.x += self.dx
-#         self.y += self.dy
-#
-#     def reflect_horizontally(self):
-#         self.dx = -self.dx
-#
-#     def reflect_vertically(self):
-#         self.dy = -self.dy
-#
-#     def get_position(self):
-#         return (self.x, self.y)
-#
-#     def get_radius(self):
-#         return self.radius
 
 
 class Ball(Entity):
@@ -285,29 +220,7 @@ class Ball(Entity):
         return self.radius
 
 
-# class Ball_old:
-#     def __init__(self, position, game_stage):
-#         self.game_stage = game_stage
-#         self.sprite_surface = load_sprite("ball")
-#         self.position = Vector2(position)
-#         self.sound = load_sound("bounce")
-#         self.radio = self.sprite_surface.get_width() / 2
-#         # self.height = self.sprite_surface.get_height()
-#         self.dx, self.dy = -1, -1
-#         self.speed = 5
-#
-#     def move(self) -> None:
-#
-#         self.position.x += self.dx * self.speed
-#         self.position.y += self.dy * self.speed
-#
-#         if abs(self.position.x - WIDTH) > WIDTH or WIDTH - (self.position.x + self.radio + 5) <= 0:
-#             self.dx = -self.dx
-#             self.position.x += self.dx
-#
-#         if abs(self.position.y - HEIGHT) > HEIGHT:
-#             self.dy = -self.dy
-#             self.position.y += self.dy
+
 
 
 class Impact_old(Entity):
