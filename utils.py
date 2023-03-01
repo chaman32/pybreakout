@@ -17,6 +17,13 @@ def load_sprite(name, with_alpha=True):
     else:
         return loaded_sprite.convert()
 
+def normalised(x, y):
+    # Return a unit vector
+    # Get length of vector (x,y) - math.hypot uses Pythagoras' theorem to get length of hypotenuse
+    # of right-angle triangle with sides of length x and y
+    # todo note on safety
+    length = math.hypot(x, y)
+    return x / length, y / length
 
 def wrap_position(position, surface):
     x, y = position

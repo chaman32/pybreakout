@@ -1,4 +1,5 @@
 import decimal
+import math
 
 import sys
 
@@ -9,7 +10,7 @@ import pygame
 from pygame.locals import *
 from GameStage import GameStage
 from GameStage import Entity
-from utils import load_sound, load_sprite, init_pygame
+from utils import load_sound, load_sprite, init_pygame, normalised
 from pygame.math import Vector2
 
 # Set up constants
@@ -80,8 +81,6 @@ class Breakout:
             pygame.display.flip()
             clock.tick(60)
 
-
-
     def handle_input(self, events, callback) -> None:
 
         self.frame_advance = False
@@ -99,37 +98,37 @@ class Breakout:
         elif is_key_pressed[pygame.K_RIGHT]:
             callback(1)
 
-       # def check_collision(self) -> None:
-       #
-       #  if self.ball.position.y >= 565:
-       #
-       #      ball_x, ball_y = self.ball.get_position()
-       #      bat_x, bat_y = self.bat.get_position()
-       #
-       #      difference_x = ball_x + self.ball.get_radius() - bat_x
-       #
-       #      if not self.ball_is_play:
-       #          if -5 < difference_x < 120:
-       #              dx, dy = self.ball.get_direction()
-       #              # check this logic
-       #              # self.ball.direction.x = -dx
-       #              self.ball.direction.y = -dy
-       #              self.ball.sound.play()
-       #
-       #              self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
-       #
-       #              # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
-       #              print("Impact! difference {}, ball X:{} and bat X:{} "
-       #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
-       #          else:
-       #              self.ball_is_play = True
-       #              print("Finish difference {}, ball X:{} and bat X:{} "
-       #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
-       #      else:
-       #          # Temporary until I do something with the lost match
-       #          self.ball_is_play = False
+    # def check_collision(self) -> None:
+    #
+    #  if self.ball.position.y >= 565:
+    #
+    #      ball_x, ball_y = self.ball.get_position()
+    #      bat_x, bat_y = self.bat.get_position()
+    #
+    #      difference_x = ball_x + self.ball.get_radius() - bat_x
+    #
+    #      if not self.ball_is_play:
+    #          if -5 < difference_x < 120:
+    #              dx, dy = self.ball.get_direction()
+    #              # check this logic
+    #              # self.ball.direction.x = -dx
+    #              self.ball.direction.y = -dy
+    #              self.ball.sound.play()
+    #
+    #              self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
+    #
+    #              # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
+    #              print("Impact! difference {}, ball X:{} and bat X:{} "
+    #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
+    #          else:
+    #              self.ball_is_play = True
+    #              print("Finish difference {}, ball X:{} and bat X:{} "
+    #                    .format(difference_x, self.ball.position.x, self.bat.position.x))
+    #      else:
+    #          # Temporary until I do something with the lost match
+    #          self.ball_is_play = False
 
-    def check_collision(self) -> None:
+    def check_collision2(self) -> None:
 
         if self.ball.position.y >= 565:
 
@@ -143,27 +142,62 @@ class Breakout:
 
             difference_x = ball_x + self.ball.get_radius() - bat_x
 
-            if not self.ball_is_play:
-                if ball_rect.colliderect(paddle_rect):
-                    dx, dy = self.ball.get_direction()
-                    # check this logic
-                    # self.ball.direction.x = -dx
-                    self.ball.direction.y = -dy
-                    self.ball.sound.play()
+            if ball_rect.colliderect(paddle_rect):
+                dx, dy = self.ball.get_direction()
+                # check this logic
+                # self.ball.direction.x = -dx
+                self.ball.direction.y = -dy
+                self.ball.sound.play()
 
-                    self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
+                self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
 
-                    # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
-                    print("Impact! difference {}, ball X:{} and bat X:{} "
-                          .format(difference_x, self.ball.position.x, self.bat.position.x))
-                else:
-                    self.ball_is_play = True
-                    print("Finish difference {}, ball X:{} and bat X:{} "
-                          .format(difference_x, self.ball.position.x, self.bat.position.x))
+                # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
+                print("Impact! difference {}, ball X:{} and bat X:{} "
+                      .format(difference_x, self.ball.position.x, self.bat.position.x))
             else:
-                # Temporary until I do something with the lost match
-                self.ball_is_play = False
+                self.ball_is_play = True
+                print("Finish difference {}, ball X:{} and bat X:{} "
+                      .format(difference_x, self.ball.position.x, self.bat.position.x))
 
+    def check_collision(self) -> None:
+
+        if self.ball.position.y >= 565:
+
+            # new_ball_speed = Vector2(1.2, 1.2)
+            new_ball_speed = 1.4
+            ball_x, ball_y = self.ball.get_position()
+            bat_x, bat_y = self.bat.get_position()
+            ball_width, ball_height = self.ball.get_width_height()
+            bat_width, bat_height = self.bat.get_width_height()
+
+            ball_rect = pygame.Rect(ball_x, ball_y, ball_width, ball_height)
+            paddle_rect = pygame.Rect(bat_x, bat_y, bat_width, bat_height)
+
+            difference_x = ball_x + self.ball.get_radius() - bat_x
+
+            if ball_rect.colliderect(paddle_rect):
+                # Calculate the point of contact between the ball and paddle
+
+                normalized_difference_x = difference_x / bat_width
+                bounce_angle = normalized_difference_x * math.pi / 3 - math.pi / 6
+
+                # Calculate the new direction of the ball based on the bounce angle
+                new_direction = Vector2(math.sin(bounce_angle), -math.cos(bounce_angle))
+                if new_direction.y > 0:
+                    new_direction.y = -new_direction.y
+
+                self.ball.direction = new_direction.normalize() * new_ball_speed
+                self.ball.sound.play()
+
+                self.impacts.append(Impact(Vector2(ball_x, ball_y), surface=self.surface))
+
+                # self.game_stage.add_animations(Impact((self.ball.position.x, self.ball.position.y)))
+                print("Impact! difference {}, ball X:{} and bat X:{} "
+                      .format(difference_x, self.ball.position.x, self.bat.position.x))
+            else:
+                self.ball_is_play = True
+                print("Finish difference {}, ball X:{} and bat X:{} "
+                      .format(difference_x, self.ball.position.x, self.bat.position.x))
 
     def update(self):
         for entity in [self.ball] + [self.bat] + self.impacts:
@@ -180,16 +214,14 @@ class Breakout:
 
 
 class Brick(Entity):
-
     # Define the brick's position and size
     brick_x = 100
     brick_y = 200
     brick_width = 50
     brick_height = 20
+
     def __init__(self, position, surface):
         super().__init__(position, None, None, surface)
-
-
 
 
 class Bat(Entity):
@@ -221,10 +253,6 @@ class Bat(Entity):
         return self.direction.x, self.direction.y
 
 
-
-
-
-
 class Ball(Entity):
 
     def __init__(self, position, surface):
@@ -254,9 +282,6 @@ class Ball(Entity):
 
     def get_radius(self):
         return self.radius
-
-
-
 
 
 class Impact_old(Entity):
